@@ -48,8 +48,9 @@ jobs:
       - name: Build da imagem
         run: docker build -t ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest .
 
+
       - name: Push da imagem
-        run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest
+        run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest 
 
   deploy:
     runs-on: ubuntu-latest
