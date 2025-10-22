@@ -37,7 +37,7 @@ resource "koyeb_service" "my-service" {
     health_checks {
       http {
         port = var.container_port
-        path = "/saudacao"
+        path = "/api/saudacoes/aleotorio"
       }
     }
     regions = ["was"]
