@@ -46,7 +46,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Build da imagem
-        run: docker build -t ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest .
+        run: docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest . --load
 
       - name: Push da imagem
         run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest
