@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Rodar Lint
+        run: go fmt ./...
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build-lint
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Rodar Testes
+        run: go test ./...
+
+  release:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Login no Docker Hub
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Build da imagem
+        run: docker build -t ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest .
+
+      - name: Push da imagem
+        run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Deploy no Koyeb
+        run: |
+          curl -X POST https://app.koyeb.com/v1/services \
+          -H "Authorization: Bearer ${{ secrets.KOYEB_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "name": "saudacoes",
+            "image": "${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest"
+          }'
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Cleanup manual
+        run: echo "Infraestrutura será destruída após aprovação manual"
