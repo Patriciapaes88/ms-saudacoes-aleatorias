@@ -48,9 +48,8 @@ jobs:
       - name: Build da imagem
         run: docker build -t ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest .
 
-
       - name: Push da imagem
-        run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest 
+        run: docker push ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -63,7 +62,7 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{
             "name": "saudacoes",
-            "image": "${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest"
+            "image": "'${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias:latest'"
           }'
 
   cleanup:
